@@ -17,3 +17,5 @@ mkdir tmp;
 (cd tmp; tar -xzvf $file)
 cp tmp/oras pyenv/bin
 rm -rf tmp
+
+./make-inputs.sh

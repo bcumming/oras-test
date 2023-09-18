@@ -1,3 +1,21 @@
+# Some notes
+
+## artifact types
+
+https://github.com/opencontainers/artifacts/blob/main/artifact-authors.md#visualizing-artifacts
+
+For our images, we need an artifact type.
+I would suggest:
+`application/vnd.cscs.uenv.config`
+
+## pushing
+
+```
+oras push --artifact-type application/vnd.cscs.uenv.config img1.sqfs
+```
+
+# Getting started
+
 Set up the python environment:
 
 ```bash
