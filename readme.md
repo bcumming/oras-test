@@ -8,10 +8,30 @@ For our images, we need an artifact type.
 I would suggest:
 `application/vnd.cscs.uenv.config`
 
+## logging in
+
+when working interactively from the prompt:
+```
+cat TOKEN | oras login jfrog.svc.cscs.ch --username bcumming --password-stdin
+```
+
+in the pipeline:
+```
+oras_u=$(echo ${creds_json} | jq -r '.container_registry.username')
+oras_p=$(echo ${creds_json} | jq -r '.container_registry.password')
+
+echo ${oras_p} | oras login jfrog.svc.cscs.ch --username ${oras_u} --password-stdin
+```
+
 ## pushing
 
 ```
-oras push --artifact-type application/vnd.cscs.uenv.config img1.sqfs
+rego=jfrog.svc.cscs.ch/uenv
+repo=build/${CLUSTER_NAME}/${PIPELINE}/${TARGET}
+
+oras push ${rego}/${build} --artifact-type application/vnd.cscs.uenv.config store.sqfs
+
+oras copy ${rego}/build/${cluster}/${build_id}/${id} ${rego}/deploy/$cluster/$...
 ```
 
 # Getting started

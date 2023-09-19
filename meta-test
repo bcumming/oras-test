@@ -1,0 +1,31 @@
+rego=jfrog.svc.cscs.ch/uenv
+repo_base=build/hohgant/1009239090/prgenv-gnu-mc
+repo=${repo_base}:latest
+repo=${repo_base}:build
+
+# oras attach will associate an artifact with our squashfs image.
+# in this case a path called meta that will  automatically be tar-balled by Oras.
+oras attach --artifact-type uenv/meta $rego/$repo ./meta
+
+# oras disciver will 
+oras discover $rego/$repo
+
+# now "copy" to deploy
+# the --recursive flag is required to ensure that the references (meta data) are copied too
+oras copy --recursive ${rego}/${repo} ${rego}/deploy/hohgant/prgenv-gnu-mc:build
+
+# our meta data should still be attached
+oras discover ${rego}/deploy/hohgant/prgenv-gnu-mc:build
+
+# then I delete the original build folder contents using the web interface
+
+# the following will extrac the digest of the first associated artifact with type "uenv/meta"
+# to understand more, pass to `jq .` to see the whole JSON.
+oras discover -o json --artifact-type 'uenv/meta' jfrog.svc.cscs.ch/uenv/deploy/hohgant/prgenv-gnu-mc:build | jq -r '.manifests[0].digest'
+
+# put it in a variable
+DIGEST=$(oras discover -o json --artifact-type 'uenv/meta' jfrog.svc.cscs.ch/uenv/deploy/hohgant/prgenv-gnu-mc:build | jq -r '.manifests[0].digest')
+
+# now we can download the meta path, putting it in a new path ./download for hygene reasons
+# note that instead of a :tag, we provide @digest
+oras pull -o ./download jfrog.svc.cscs.ch/uenv/deploy/hohgant/prgenv-gnu-mc@$DIGEST
